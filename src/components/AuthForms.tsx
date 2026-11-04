@@ -3,7 +3,14 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { getDict, type Locale } from '@/i18n/dict'
 
-export function AuthForms({ locale, next }: { locale: Locale; next: string }) {
+function contactHref(c: string) {
+  if (/^https?:\/\//.test(c)) return c
+  if (c.startsWith('@')) return `https://t.me/${c.slice(1)}`
+  if (c.includes('@')) return `mailto:${c}`
+  return ''
+}
+
+export function AuthForms({ locale, next, emailReset = false, adminContact = '' }: { locale: Locale; next: string; emailReset?: boolean; adminContact?: string }) {
   const t = getDict(locale)
   const router = useRouter()
   const [mode, setMode] = useState<'login' | 'register' | 'forgot'>('login')
@@ -60,14 +67,24 @@ export function AuthForms({ locale, next }: { locale: Locale; next: string }) {
     return (
       <div>
         <h1>{t.auth.forgotTitle}</h1>
-        {sent ? (
+        <p>{t.auth.forgotAdmin}</p>
+        {adminContact && (
+          <p>
+            {contactHref(adminContact) && (
+              <a className="btn small" href={contactHref(adminContact)} target="_blank" rel="noopener noreferrer" style={{ marginRight: 10 }}>{t.auth.forgotContact}</a>
+            )}
+            <span className="faint">{adminContact}</span>
+          </p>
+        )}
+        {emailReset && (sent ? (
           <div className="notice" style={{ marginBottom: 12 }}>{t.auth.forgotSent}</div>
         ) : (
-          <form onSubmit={submit}>
+          <form onSubmit={submit} style={{ marginTop: 20 }}>
+            <p className="muted">{t.auth.forgotOr}</p>
             <div className="field"><label htmlFor="email">{t.auth.email}</label><input id="email" name="email" type="email" required autoComplete="email" /></div>
             <button className="btn" disabled={busy}>{t.auth.forgotSubmit}</button>
           </form>
-        )}
+        ))}
         <p style={{ marginTop: 18 }}>
           <button className="btn ghost small" onClick={() => { setMode('login'); setSent(false) }}>{t.auth.back}</button>
         </p>

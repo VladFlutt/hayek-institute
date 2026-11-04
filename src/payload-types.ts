@@ -107,9 +107,11 @@ export interface Config {
   fallbackLocale: ('false' | 'none' | 'null') | false | null | ('ru' | 'en') | ('ru' | 'en')[];
   globals: {
     'assistant-charter': AssistantCharter;
+    'school-settings': SchoolSetting;
   };
   globalsSelect: {
     'assistant-charter': AssistantCharterSelect<false> | AssistantCharterSelect<true>;
+    'school-settings': SchoolSettingsSelect<false> | SchoolSettingsSelect<true>;
   };
   locale: 'ru' | 'en';
   widgets: {
@@ -759,12 +761,35 @@ export interface AssistantCharter {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "school-settings".
+ */
+export interface SchoolSetting {
+  id: number;
+  /**
+   * Email or link (e.g. https://t.me/name). Shown to a student who forgot the password.
+   */
+  adminContact?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "assistant-charter_select".
  */
 export interface AssistantCharterSelect<T extends boolean = true> {
   enabled?: T;
   dailyLimit?: T;
   charter?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "school-settings_select".
+ */
+export interface SchoolSettingsSelect<T extends boolean = true> {
+  adminContact?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

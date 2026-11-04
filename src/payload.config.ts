@@ -19,6 +19,7 @@ import { Media } from './collections/Media'
 import { Resources } from './collections/Resources'
 import { Users } from './collections/Users'
 import { AssistantCharter } from './globals/AssistantCharter'
+import { SchoolSettings } from './globals/SchoolSettings'
 import { redeemEndpoint } from './endpoints/redeem'
 import { tutorEndpoint } from './endpoints/tutor'
 
@@ -58,7 +59,7 @@ export default buildConfig({
     fallback: true,
   },
   collections: [Levels, Courses, Lessons, Resources, Glossary, AccessCodes, Users, Media, Documents],
-  globals: [AssistantCharter],
+  globals: [AssistantCharter, SchoolSettings],
   endpoints: [redeemEndpoint, tutorEndpoint],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',

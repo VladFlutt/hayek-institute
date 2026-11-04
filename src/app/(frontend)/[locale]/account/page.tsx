@@ -19,9 +19,10 @@ export default async function AccountPage({ params, searchParams }: { params: Pr
   const safeNext = next && next.startsWith('/') && !next.startsWith('//') ? next : `/${locale}/account`
 
   if (!user) {
+    const settings = await (await getPayloadClient()).findGlobal({ slug: 'school-settings', depth: 0 }).catch(() => null)
     return (
       <div className="wrap" style={{ padding: '40px 20px', maxWidth: 460 }}>
-        <AuthForms locale={locale} next={safeNext} />
+        <AuthForms locale={locale} next={safeNext} emailReset={!!process.env.SMTP_HOST} adminContact={settings?.adminContact || ''} />
       </div>
     )
   }
