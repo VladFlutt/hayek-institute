@@ -21,16 +21,54 @@ export const aiConfig = () => {
   }
 }
 
+// Providers retire models. When the configured one is gone, pick a current one from the provider's /models list.
+const PREFERRED = ['gpt-oss-120b', 'kimi-k2', 'llama-4-maverick', 'qwen3-32b', 'llama-3.3-70b', 'deepseek', 'mistral-medium', 'mistral-small', 'gemini', 'llama-4-scout', 'gpt-oss-20b']
+const NOT_CHAT = /whisper|tts|guard|embed|vision-only|orpheus|playai|distil|compound|safeguard/i
+let fallbackModel: string | null = null
+
+export async function listModels(): Promise<string[]> {
+  const { baseUrl, apiKey } = aiConfig()
+  const res = await fetch(`${baseUrl}/models`, { headers: { authorization: `Bearer ${apiKey}` } })
+  if (!res.ok) return []
+  const d = (await res.json().catch(() => ({}))) as { data?: { id: string; active?: boolean }[] }
+  return (d.data ?? []).filter((m) => m.active !== false).map((m) => m.id)
+}
+
+async function pickFallbackModel(): Promise<string | null> {
+  const ids = (await listModels()).filter((id) => !NOT_CHAT.test(id))
+  for (const p of PREFERRED) {
+    const hit = ids.find((id) => id.toLowerCase().includes(p))
+    if (hit) return hit
+  }
+  return ids[0] ?? null
+}
+
+/** The model actually used (after an automatic fallback, if one happened). */
+export const currentModel = () => fallbackModel || aiConfig().model
+
 /** Streams assistant text deltas from an OpenAI-compatible /chat/completions endpoint. */
 export async function streamChat(messages: ChatMessage[], signal?: AbortSignal): Promise<ReadableStream<Uint8Array>> {
-  const { baseUrl, apiKey, model } = aiConfig()
+  const { baseUrl, apiKey } = aiConfig()
   if (!apiKey) throw new Error('AI_API_KEY is not set')
-  const res = await fetch(`${baseUrl}/chat/completions`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json', authorization: `Bearer ${apiKey}` },
-    body: JSON.stringify({ model, messages, stream: true, temperature: 0.3 }),
-    signal,
-  })
+  const call = (model: string) =>
+    fetch(`${baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', authorization: `Bearer ${apiKey}` },
+      body: JSON.stringify({ model, messages, stream: true, temperature: 0.3 }),
+      signal,
+    })
+  let res = await call(currentModel())
+  if ((res.status === 404 || res.status === 400) && !process.env.AI_MODEL) {
+    const text = await res.clone().text().catch(() => '')
+    if (/model_not_found|model_decommissioned|does not exist|decommissioned/i.test(text)) {
+      const next = await pickFallbackModel()
+      if (next && next !== currentModel()) {
+        console.warn(`AI model ${currentModel()} is unavailable, switching to ${next}`)
+        fallbackModel = next
+        res = await call(next)
+      }
+    }
+  }
   if (!res.ok || !res.body) {
     const text = await res.text().catch(() => '')
     throw new Error(`AI provider error ${res.status}: ${text.slice(0, 300)}`)

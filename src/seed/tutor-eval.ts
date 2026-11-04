@@ -6,7 +6,7 @@
  */
 import { getPayload } from 'payload'
 import config from '@payload-config'
-import { aiConfig, streamChat } from '../lib/ai'
+import { aiConfig, currentModel, listModels, streamChat } from '../lib/ai'
 import { buildTutorSystem } from '../lib/tutor'
 
 type Case = { id: number; locale: 'ru' | 'en'; mode: string; q: string; expect: string; lessonSlug?: string }
@@ -46,7 +46,8 @@ if (!process.env.AI_API_KEY) {
 }
 const only = (process.env.TUTOR_EVAL_ONLY || '').split(',').map(Number).filter(Boolean)
 const { model, baseUrl } = aiConfig()
-console.log(`\n===== TUTOR EVAL · model ${model} · ${new URL(baseUrl).host} =====`)
+console.log(`\n===== TUTOR EVAL · configured model ${model} · ${new URL(baseUrl).host} =====`)
+console.log(`Available models: ${(await listModels()).join(', ')}`)
 let failed = 0
 for (const c of CASES.filter((x) => !only.length || only.includes(x.id))) {
   const charter = await payload.findGlobal({ slug: 'assistant-charter', locale: c.locale, overrideAccess: true })
@@ -65,12 +66,12 @@ for (const c of CASES.filter((x) => !only.length || only.includes(x.id))) {
   })
   try {
     const { text, ms } = await ask(system, c.q)
-    console.log(`\n----- #${c.id} [${c.locale}/${c.mode}] ${c.q}\nEXPECT: ${c.expect}\nTIME: ${ms} ms · ${text.length} chars\n${text}\n`)
+    console.log(`\n----- #${c.id} [${c.locale}/${c.mode}] ${c.q}\nEXPECT: ${c.expect}\nTIME: ${ms} ms · ${text.length} chars · ${currentModel()}\n${text}\n`)
   } catch (e) {
     failed++
     console.log(`\n----- #${c.id} FAILED: ${(e as Error).message}\n`)
   }
   await new Promise((r) => setTimeout(r, Number(process.env.TUTOR_EVAL_DELAY_MS ?? 25000))) // free tiers limit tokens per minute
 }
-console.log(`===== TUTOR EVAL done, ${failed} failed =====\n`)
+console.log(`===== TUTOR EVAL done, ${failed} failed, model used: ${currentModel()} =====\n`)
 process.exit(0)
