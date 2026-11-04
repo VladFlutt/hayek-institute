@@ -1,8 +1,13 @@
 'use client'
 import Link from 'next/link'
 import { marked } from 'marked'
+
 import { useEffect, useRef, useState } from 'react'
 import { getDict, type Locale } from '@/i18n/dict'
+
+// Model output is untrusted: no raw HTML, no script links
+const safeMarkdown = (src: string) =>
+  (marked.parse(src.replace(/</g, '&lt;'), { async: false }) as string).replace(/href="\s*(javascript|data|vbscript):[^"]*"/gi, 'href="#"')
 
 type Msg = { role: 'user' | 'assistant'; content: string }
 const MODES = ['explain', 'check', 'socratic', 'exam'] as const
@@ -92,7 +97,7 @@ export function TutorChat({ locale, loggedIn, lessonId, compact = false }: { loc
               <div
                 key={i}
                 className="msg assistant prose"
-                dangerouslySetInnerHTML={{ __html: m.content ? (marked.parse(m.content, { async: false }) as string) : `<span class="faint">${t.tutor.thinking}</span>` }}
+                dangerouslySetInnerHTML={{ __html: m.content ? safeMarkdown(m.content) : `<span class="faint">${t.tutor.thinking}</span>` }}
               />
             ),
           )

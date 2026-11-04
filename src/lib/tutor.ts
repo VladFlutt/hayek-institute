@@ -60,6 +60,8 @@ export async function buildTutorSystem(
       ? `## Найденные фрагменты материалов школы\n${excerpts.map((e, i) => `[${i + 1}] ${e.course} — ${e.lesson} (${e.url})\n${e.text}`).join('\n\n')}`
       : '## Найденные фрагменты материалов школы\n(ничего не найдено — отвечай из принципов Хартии и честно скажи, что в материалах школы прямого ответа нет)',
     terms.length ? `## Глоссарий школы\n${terms.map((t) => `- ${t.term}: ${t.definition}${t.source ? ` (${t.source})` : ''}`).join('\n')}` : '',
-    'Ссылаясь на занятие, давай markdown-ссылку на его адрес из списка выше.',
+    locale === 'en'
+      ? 'Format: be concise (usually 150–300 words); use a table only when it truly helps. When you cite a lesson, give a markdown link with its relative address exactly as listed above (it starts with /en/courses/). Never invent addresses, lesson numbers, sections or quotes.'
+      : 'Формат: отвечай сжато (обычно 150–300 слов), таблицу давай только когда без неё никак. Ссылаясь на занятие, давай markdown-ссылку с его относительным адресом ровно в том виде, как он указан выше (начинается с /ru/courses/). Не выдумывай адресов, номеров занятий, параграфов и цитат.',
   ].filter(Boolean).join('\n\n')
 }

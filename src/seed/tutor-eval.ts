@@ -66,7 +66,8 @@ for (const c of CASES.filter((x) => !only.length || only.includes(x.id))) {
   })
   try {
     const { text, ms } = await ask(system, c.q)
-    console.log(`\n----- #${c.id} [${c.locale}/${c.mode}] ${c.q}\nEXPECT: ${c.expect}\nTIME: ${ms} ms · ${text.length} chars · ${currentModel()}\n${text}\n`)
+    // One log line per answer, so the whole run is easy to read from build logs
+    console.log(`#${c.id} [${c.locale}/${c.mode}] Q: ${c.q} || EXPECT: ${c.expect} || ${ms} ms, ${text.length} chars || A: ${text.replace(/\s+/g, ' ').slice(0, 2500)}`)
   } catch (e) {
     failed++
     console.log(`\n----- #${c.id} FAILED: ${(e as Error).message}\n`)
