@@ -22,6 +22,7 @@ import { AssistantCharter } from './globals/AssistantCharter'
 import { SchoolSettings } from './globals/SchoolSettings'
 import { redeemEndpoint } from './endpoints/redeem'
 import { tutorEndpoint } from './endpoints/tutor'
+import { progressEndpoint } from './endpoints/progress'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -60,7 +61,7 @@ export default buildConfig({
   },
   collections: [Levels, Courses, Lessons, Resources, Glossary, AccessCodes, Users, Media, Documents],
   globals: [AssistantCharter, SchoolSettings],
-  endpoints: [redeemEndpoint, tutorEndpoint],
+  endpoints: [redeemEndpoint, tutorEndpoint, progressEndpoint],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: { outputFile: path.resolve(dirname, 'payload-types.ts') },

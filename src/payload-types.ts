@@ -357,6 +357,10 @@ export interface User {
   role: 'admin' | 'editor' | 'translator' | 'student';
   allAccess?: boolean | null;
   unlockedCourses?: (number | Course)[] | null;
+  /**
+   * Marked by the student on the lesson page.
+   */
+  completedLessons?: (number | Lesson)[] | null;
   tutorUsage?: {
     day?: string | null;
     count?: number | null;
@@ -619,6 +623,7 @@ export interface UsersSelect<T extends boolean = true> {
   role?: T;
   allAccess?: T;
   unlockedCourses?: T;
+  completedLessons?: T;
   tutorUsage?:
     | T
     | {

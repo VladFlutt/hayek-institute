@@ -197,3 +197,10 @@ details.q div { margin-top: 8px; color: var(--ink-2); }
 .site-footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 .video-fallback { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin: 14px 0 0; }
 .video-fallback .faint { flex: 1 1 260px; }
+
+/* Lesson progress */
+.progress-mark { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin: 28px 0 0; }
+.progress { display: flex; align-items: center; gap: 12px; margin: 14px 0 0; }
+.progress .bar { flex: 1; max-width: 320px; height: 8px; border-radius: 99px; background: var(--rule); overflow: hidden; }
+.progress .bar > i { display: block; height: 100%; background: var(--gold); }
+.lesson-list .done-mark { color: var(--gold); font-weight: 700; margin-left: 6px; }

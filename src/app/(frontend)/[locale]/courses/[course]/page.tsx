@@ -50,6 +50,8 @@ export default async function CoursePage({ params }: { params: Promise<{ locale:
     const key = l.kind === 'lecture' && l.number == null ? 'bonus' : l.kind
     groups.find((g) => g.key === key)?.items.push(l)
   }
+  const doneIds = new Set((user?.completedLessons ?? []).map((l) => (typeof l === 'object' ? l.id : l)))
+  const doneCount = lessons.docs.filter((l) => doneIds.has(l.id)).length
   const level = typeof course.level === 'object' ? course.level : null
 
   const list = (g: (typeof groups)[number]) => (
@@ -66,6 +68,7 @@ export default async function CoursePage({ params }: { params: Promise<{ locale:
                   {l.title}
                   {l.date ? <span className="faint"> · {l.date}</span> : null}
                 </span>
+                {doneIds.has(l.id) ? <span className="done-mark" title={t.lesson.done}>✓</span> : null}
                 {l.free && !has ? <span className="tag gold">{t.course.free}</span> : null}
                 <span className="lock" title={open ? t.course.open : t.access.locked}>
                   <LockIcon open={open} />
@@ -93,6 +96,12 @@ export default async function CoursePage({ params }: { params: Promise<{ locale:
             {course.year ? <span>{t.course.when}: <b>{course.year}</b></span> : null}
             <span><b>{lessons.totalDocs}</b> {t.course.lessons}</span>
           </div>
+          {doneCount ? (
+            <div className="progress">
+              <span className="bar"><i style={{ width: `${Math.round((doneCount / lessons.totalDocs) * 100)}%` }} /></span>
+              <span className="faint">{t.course.progress} {doneCount} {t.course.of} {lessons.totalDocs}</span>
+            </div>
+          ) : null}
           {course.description ? <div className="prose" dangerouslySetInnerHTML={{ __html: md(course.description) }} /> : null}
           {course.outcomes?.length ? (
             <ul>{course.outcomes.map((o) => <li key={o.id}>{o.text}</li>)}</ul>

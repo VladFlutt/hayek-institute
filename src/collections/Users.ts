@@ -90,6 +90,16 @@ export const Users: CollectionConfig = {
       label: { ru: 'Открытые курсы', en: 'Unlocked courses' },
     },
     {
+      name: 'completedLessons',
+      maxDepth: 0,
+      type: 'relationship',
+      relationTo: 'lessons',
+      hasMany: true,
+      admin: { readOnly: true, description: { ru: 'Отмечает сам слушатель на странице занятия.', en: 'Marked by the student on the lesson page.' } },
+      access: { update: adminField },
+      label: { ru: 'Пройденные занятия', en: 'Completed lessons' },
+    },
+    {
       name: 'tutorUsage',
       type: 'group',
       admin: { readOnly: true },

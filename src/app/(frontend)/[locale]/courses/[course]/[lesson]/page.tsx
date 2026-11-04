@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { LockIcon } from '@/components/Logo'
+import { ProgressButton } from '@/components/ProgressButton'
 import { RedeemForm } from '@/components/RedeemForm'
 import { TutorChat } from '@/components/TutorChat'
 import { canOpenLesson } from '@/access/lessonAccess'
@@ -122,6 +123,16 @@ export default async function LessonPage({ params }: P) {
                 </details>
               ))}
             </section>
+          ) : null}
+
+          {open ? (
+            <ProgressButton
+              locale={locale}
+              lessonId={lesson.id}
+              loggedIn={Boolean(user)}
+              initialDone={(user?.completedLessons ?? []).some((l) => (typeof l === 'object' ? l.id : l) === lesson.id)}
+              loginHref={`/${locale}/account?next=${encodeURIComponent(`${base}/${lesson.slug}`)}`}
+            />
           ) : null}
 
           <div className="pager">

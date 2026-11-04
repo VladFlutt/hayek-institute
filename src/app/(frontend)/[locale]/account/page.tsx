@@ -33,6 +33,25 @@ export default async function AccountPage({ params, searchParams }: { params: Pr
     ? (await payload.find({ collection: 'courses', locale, where: { id: { in: ids } }, depth: 0, limit: 100 })).docs
     : []
 
+  const doneIds = (user.completedLessons ?? []).map((l) => (typeof l === 'object' ? l.id : l))
+  const doneLessons = doneIds.length
+    ? (await payload.find({ collection: 'lessons', where: { id: { in: doneIds } }, depth: 0, limit: 1000, select: { course: true } })).docs
+    : []
+  const perCourse = new Map<number, number>()
+  for (const l of doneLessons) {
+    const c = typeof l.course === 'object' ? l.course?.id : l.course
+    if (c) perCourse.set(c, (perCourse.get(c) ?? 0) + 1)
+  }
+  const progress = perCourse.size
+    ? await Promise.all(
+        (await payload.find({ collection: 'courses', locale, where: { id: { in: [...perCourse.keys()] } }, depth: 0, limit: 100 })).docs.map(async (c) => ({
+          c,
+          done: perCourse.get(c.id) ?? 0,
+          total: (await payload.count({ collection: 'lessons', where: { course: { equals: c.id } } })).totalDocs,
+        })),
+      )
+    : []
+
   return (
     <div className="wrap narrow" style={{ padding: '40px 20px' }}>
       <h1>{t.auth.hello}{user.name ? `, ${user.name}` : ''}</h1>
@@ -44,6 +63,20 @@ export default async function AccountPage({ params, searchParams }: { params: Pr
         <ul>{courses.map((c) => <li key={c.id}><Link href={`/${locale}/courses/${c.slug}`}>{c.title}</Link></li>)}</ul>
       ) : (
         <p className="muted">{t.auth.none}</p>
+      )}
+      <h2 style={{ marginTop: 28 }}>{t.auth.myProgress}</h2>
+      {progress.length ? (
+        progress.map(({ c, done, total }) => (
+          <div key={c.id} style={{ marginBottom: 14 }}>
+            <Link href={`/${locale}/courses/${c.slug}`}>{c.title}</Link>
+            <div className="progress" style={{ marginTop: 6 }}>
+              <span className="bar"><i style={{ width: `${Math.round((done / Math.max(total, 1)) * 100)}%` }} /></span>
+              <span className="faint">{done} {t.course.of} {total}</span>
+            </div>
+          </div>
+        ))
+      ) : (
+        <p className="muted">{t.auth.noProgress}</p>
       )}
       <div className="side-box" style={{ margin: '24px 0' }} id="access">
         <b className="serif" style={{ fontSize: '1.2rem' }}>{t.access.enterCode}</b>
