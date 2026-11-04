@@ -10,8 +10,14 @@ export async function searchLessons(payload: Payload, query: string, locale: 'ru
   const db = (payload.db as any).drizzle
   if (!db || !query.trim()) return []
   const q = query.slice(0, 400)
+  // Any word may match (OR), ranking decides; websearch_to_tsquery alone would require every word.
   const result = await db.execute(sql`
-    with docs as (
+    with q as (
+      select
+        nullif(replace(websearch_to_tsquery('russian', ${q})::text, '&', '|'), '')::tsquery as ru,
+        nullif(replace(websearch_to_tsquery('english', ${q})::text, '&', '|'), '')::tsquery as en
+    ),
+    docs as (
       select l.id, l.slug, c.slug as course_slug,
         coalesce(cl.title, '') as course_title, coalesce(ll.title, '') as title,
         coalesce(ll.summary, '') || ' ' || coalesce(ll.body, '') || ' ' || coalesce(l.transcript, '') as content
@@ -20,17 +26,17 @@ export async function searchLessons(payload: Payload, query: string, locale: 'ru
       left join courses_locales cl on cl._parent_id = c.id and cl._locale = ${locale}
       left join lessons_locales ll on ll._parent_id = l.id and ll._locale = ${locale}
       where l._status = 'published'
+    ),
+    scored as (
+      select docs.*, ts_rank(
+        setweight(to_tsvector('russian', title), 'A') || to_tsvector('russian', content) || to_tsvector('english', content),
+        coalesce(q.ru, ''::tsquery) || coalesce(q.en, ''::tsquery)
+      ) as rank
+      from docs, q
+      where (to_tsvector('russian', title || ' ' || content) || to_tsvector('english', title || ' ' || content))
+        @@ (coalesce(q.ru, ''::tsquery) || coalesce(q.en, ''::tsquery))
     )
-    select *, ts_rank(
-      setweight(to_tsvector('russian', title), 'A') || to_tsvector('russian', content) ||
-      to_tsvector('english', content),
-      websearch_to_tsquery('russian', ${q}) || websearch_to_tsquery('english', ${q})
-    ) as rank
-    from docs
-    where (to_tsvector('russian', title || ' ' || content) || to_tsvector('english', title || ' ' || content))
-      @@ (websearch_to_tsquery('russian', ${q}) || websearch_to_tsquery('english', ${q}))
-    order by rank desc
-    limit ${limit}
+    select * from scored order by rank desc limit ${limit}
   `)
   const rows = (result.rows ?? result) as any[]
   return rows
