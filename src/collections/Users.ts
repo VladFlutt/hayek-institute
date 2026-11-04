@@ -12,6 +12,19 @@ export const Users: CollectionConfig = {
   auth: {
     tokenExpiration: 60 * 60 * 24 * 30,
     cookies: { sameSite: 'Lax' },
+    forgotPassword: {
+      expiration: 60 * 60 * 1000,
+      generateEmailSubject: ({ user } = {}) =>
+        (user as { locale?: string })?.locale === 'en' ? 'Password reset — Hayek Institute' : 'Восстановление пароля — Институт Хайека',
+      generateEmailHTML: ({ req, token, user } = {}) => {
+        const locale = (user as { locale?: string })?.locale === 'en' ? 'en' : 'ru'
+        const base = process.env.NEXT_PUBLIC_SERVER_URL || req?.headers?.get('origin') || ''
+        const url = `${base}/${locale}/reset?token=${encodeURIComponent(String(token))}`
+        return locale === 'en'
+          ? `<p>Someone asked to reset the password for your Hayek Institute account.</p><p><a href="${url}">Set a new password</a> (the link works for one hour).</p><p>If it was not you, just ignore this email.</p>`
+          : `<p>Кто-то запросил смену пароля для вашего аккаунта в Институте Хайека.</p><p><a href="${url}">Задать новый пароль</a> (ссылка действует час).</p><p>Если это были не вы, просто проигнорируйте письмо.</p>`
+      },
+    },
   },
   access: {
     // Only staff can open the admin panel

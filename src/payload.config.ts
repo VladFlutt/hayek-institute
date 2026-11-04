@@ -1,4 +1,5 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
+import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 import { en } from '@payloadcms/translations/languages/en'
@@ -24,7 +25,23 @@ import { tutorEndpoint } from './endpoints/tutor'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+// Outgoing mail (password reset). Any SMTP works, e.g. Gmail with an app password:
+// SMTP_HOST=smtp.gmail.com SMTP_PORT=465 SMTP_USER=you@gmail.com SMTP_PASS=<app password>
+const email = process.env.SMTP_HOST
+  ? nodemailerAdapter({
+      defaultFromAddress: process.env.SMTP_FROM || process.env.SMTP_USER || '',
+      defaultFromName: 'Институт Хайека',
+      transportOptions: {
+        host: process.env.SMTP_HOST,
+        port: Number(process.env.SMTP_PORT || 465),
+        secure: Number(process.env.SMTP_PORT || 465) === 465,
+        auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+      },
+    })
+  : undefined
+
 export default buildConfig({
+  email,
   serverURL: process.env.NEXT_PUBLIC_SERVER_URL || '',
   admin: {
     user: Users.slug,

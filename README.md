@@ -16,6 +16,8 @@
 | `AI_PROVIDER` | `groq` (по умолчанию), `openrouter`, `mistral`, `gemini` |
 | `AI_API_KEY` | ключ провайдера ИИ |
 | `AI_MODEL`, `AI_BASE_URL` | необязательно, переопределяют пресет |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM` | почта для восстановления пароля (например, Gmail с паролем приложения) |
+| `NEXT_PUBLIC_SERVER_URL` | адрес сайта для ссылок в письмах |
 
 ## Локально
 ```bash
