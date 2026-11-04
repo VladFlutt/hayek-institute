@@ -46,6 +46,8 @@ const ru = {
     open: 'Открыто',
   },
   lesson: {
+    watchOnYoutube: 'Смотреть на YouTube',
+    videoHelp: 'Если плеер просит войти в аккаунт, откройте видео на YouTube: обычно это бывает при включённом VPN или без входа в Google.',
     summary: 'Конспект',
     timecodes: 'Тайм-коды',
     questions: 'Вопросы для самопроверки',
@@ -138,6 +140,8 @@ const en: Dict = {
     open: 'Unlocked',
   },
   lesson: {
+    watchOnYoutube: 'Watch on YouTube',
+    videoHelp: 'If the player asks you to sign in, open the video on YouTube: this usually happens with a VPN on or when not signed in to Google.',
     summary: 'Summary',
     timecodes: 'Timecodes',
     questions: 'Self-check questions',

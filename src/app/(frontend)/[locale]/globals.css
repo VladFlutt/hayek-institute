@@ -195,3 +195,5 @@ details.q div { margin-top: 8px; color: var(--ink-2); }
 
 .site-footer { border-top: 1px solid var(--rule); padding: 28px 0 40px; margin-top: 40px; color: var(--ink-3); font-size: 0.88rem; }
 .site-footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.video-fallback { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin: 14px 0 0; }
+.video-fallback .faint { flex: 1 1 260px; }

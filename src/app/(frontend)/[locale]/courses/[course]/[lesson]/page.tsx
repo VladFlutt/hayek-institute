@@ -84,14 +84,21 @@ export default async function LessonPage({ params }: P) {
               </div>
             </div>
           ) : vid ? (
-            <div className="video">
-              <iframe
-                src={`https://www.youtube-nocookie.com/embed/${vid}?rel=0`}
-                title={lesson.title}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            </div>
+            <>
+              <div className="video">
+                <iframe
+                  src={`https://www.youtube.com/embed/${vid}?rel=0&modestbranding=1&playsinline=1`}
+                  title={lesson.title}
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+              </div>
+              <p className="video-fallback">
+                <a className="btn" href={`https://www.youtube.com/watch?v=${vid}`} target="_blank" rel="noopener noreferrer">▶ {t.lesson.watchOnYoutube}</a>
+                <span className="faint">{t.lesson.videoHelp}</span>
+              </p>
+            </>
           ) : null}
 
           {open && lesson.body ? <div className="prose" style={{ marginTop: 24 }} dangerouslySetInnerHTML={{ __html: md(lesson.body) }} /> : null}
