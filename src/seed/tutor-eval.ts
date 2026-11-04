@@ -44,7 +44,7 @@ if (!process.env.AI_API_KEY) {
   payload.logger.warn('TUTOR EVAL: AI_API_KEY is not set, skipped')
   process.exit(0)
 }
-const only = (process.env.TUTOR_EVAL_ONLY || (/\d/.test(process.env.TUTOR_EVAL || '') ? process.env.TUTOR_EVAL : '') || '').split(',').map(Number).filter(Boolean)
+const only = (process.env.TUTOR_EVAL_ONLY || (process.env.TUTOR_EVAL && process.env.TUTOR_EVAL !== '1' ? process.env.TUTOR_EVAL : '') || '').split(',').map(Number).filter(Boolean)
 const { model, baseUrl } = aiConfig()
 console.log(`\n===== TUTOR EVAL · configured model ${model} · ${new URL(baseUrl).host} =====`)
 console.log(`Available models: ${(await listModels()).join(', ')}`)
