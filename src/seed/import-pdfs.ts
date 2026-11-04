@@ -43,7 +43,15 @@ async function download(id: string): Promise<{ data: Buffer; mimetype: string } 
   const data = Buffer.from(await res.arrayBuffer())
   // Drive often answers application/octet-stream, so trust the file signature, not the header
   const head = data.subarray(0, 4).toString('latin1')
-  const mimetype = head === '%PDF' ? 'application/pdf' : head.startsWith('PK') && EXT[type] ? type : EXT[type] && type !== 'text/html' ? type : ''
+  const zipped = data.subarray(30, 58).toString('latin1') // EPUB stores its mimetype first in the zip
+  const mimetype =
+    head === '%PDF'
+      ? 'application/pdf'
+      : head.startsWith('PK') && zipped.includes('application/epub+zip')
+        ? 'application/epub+zip'
+        : EXT[type] && type !== 'text/html'
+          ? type
+          : ''
   if (!mimetype) {
     lastReason = `not a document (${type}, ${data.length} bytes)`
     return null
