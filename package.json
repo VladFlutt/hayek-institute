@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "build": "cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build",
-    "vercel-build": "pnpm payload migrate && pnpm seed && (pnpm import:pdfs || true) && pnpm build",
+    "vercel-build": "pnpm payload migrate && pnpm seed && pnpm content && (pnpm import:pdfs || true) && pnpm build",
+    "content": "cross-env NODE_OPTIONS=--no-deprecation payload run src/seed/content.ts",
     "import:pdfs": "cross-env NODE_OPTIONS=--no-deprecation payload run src/seed/import-pdfs.ts",
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
     "devsafe": "rm -rf .next && cross-env NODE_OPTIONS=--no-deprecation next dev",
