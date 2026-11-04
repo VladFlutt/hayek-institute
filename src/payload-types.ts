@@ -73,6 +73,7 @@ export interface Config {
     resources: Resource;
     glossary: Glossary;
     'access-codes': AccessCode;
+    certificates: Certificate;
     users: User;
     media: Media;
     documents: Document;
@@ -93,6 +94,7 @@ export interface Config {
     resources: ResourcesSelect<false> | ResourcesSelect<true>;
     glossary: GlossarySelect<false> | GlossarySelect<true>;
     'access-codes': AccessCodesSelect<false> | AccessCodesSelect<true>;
+    certificates: CertificatesSelect<false> | CertificatesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     documents: DocumentsSelect<false> | DocumentsSelect<true>;
@@ -387,6 +389,22 @@ export interface User {
   collection: 'users';
 }
 /**
+ * Выдаётся автоматически, когда слушатель отметил пройденными все занятия курса. Удалите запись, чтобы отозвать сертификат.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "certificates".
+ */
+export interface Certificate {
+  id: number;
+  code: string;
+  user: number | User;
+  course: number | Course;
+  name: string;
+  issuedAt: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -433,6 +451,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'access-codes';
         value: number | AccessCode;
+      } | null)
+    | ({
+        relationTo: 'certificates';
+        value: number | Certificate;
       } | null)
     | ({
         relationTo: 'users';
@@ -611,6 +633,19 @@ export interface AccessCodesSelect<T extends boolean = true> {
   expiresAt?: T;
   buyer?: T;
   redeemedBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "certificates_select".
+ */
+export interface CertificatesSelect<T extends boolean = true> {
+  code?: T;
+  user?: T;
+  course?: T;
+  name?: T;
+  issuedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }

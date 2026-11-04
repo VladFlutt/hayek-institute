@@ -102,6 +102,9 @@ export default async function CoursePage({ params }: { params: Promise<{ locale:
               <span className="faint">{t.course.progress} {doneCount} {t.course.of} {lessons.totalDocs}</span>
             </div>
           ) : null}
+          {doneCount && doneCount === lessons.totalDocs ? (
+            <p style={{ marginTop: 12 }}><Link className="btn" href={`/${locale}/courses/${course.slug}/certificate`}>🎓 {t.cert.get}</Link></p>
+          ) : null}
           {course.description ? <div className="prose" dangerouslySetInnerHTML={{ __html: md(course.description) }} /> : null}
           {course.outcomes?.length ? (
             <ul>{course.outcomes.map((o) => <li key={o.id}>{o.text}</li>)}</ul>

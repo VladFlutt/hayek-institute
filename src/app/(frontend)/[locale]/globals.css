@@ -204,3 +204,22 @@ details.q div { margin-top: 8px; color: var(--ink-2); }
 .progress .bar { flex: 1; max-width: 320px; height: 8px; border-radius: 99px; background: var(--rule); overflow: hidden; }
 .progress .bar > i { display: block; height: 100%; background: var(--gold); }
 .lesson-list .done-mark { color: var(--gold); font-weight: 700; margin-left: 6px; }
+
+/* Certificate */
+.certificate { background: var(--card); border: 1px solid var(--rule); border-radius: var(--radius); padding: 14px; box-shadow: var(--shadow); max-width: 1000px; margin: 0 auto; }
+.cert-inner { border: 2px solid var(--gold); outline: 1px solid var(--gold); outline-offset: -8px; border-radius: 6px; padding: clamp(28px, 6vw, 64px) clamp(18px, 5vw, 56px); text-align: center; }
+.cert-logo { width: 56px; height: 56px; margin: 0 auto 10px; color: var(--gold); }
+.cert-title { font-size: clamp(2.2rem, 6vw, 3.6rem); margin: 6px 0 18px; }
+.cert-muted { color: var(--ink-2, inherit); opacity: .8; margin: 6px 0; }
+.cert-name { font-size: clamp(1.8rem, 5vw, 2.8rem); font-weight: 600; margin: 6px 0 12px; border-bottom: 1px solid var(--rule); display: inline-block; padding: 0 24px 6px; }
+.cert-course { font-size: clamp(1.3rem, 3.5vw, 1.9rem); margin: 6px 0 24px; }
+.cert-meta { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px 28px; font-size: .95rem; }
+.cert-verify { margin: 22px 0 0; font-size: .78rem; opacity: .7; word-break: break-all; }
+@media print {
+  @page { size: A4 landscape; margin: 10mm; }
+  header, .site-header, .site-footer, .no-print { display: none !important; }
+  :root { --paper: #fff !important; --card: #fff !important; --ink: #221c15 !important; --gold: #9a7428 !important; --rule: #d9cdb5 !important; }
+  body { background: #fff !important; color: #221c15 !important; }
+  .certificate { box-shadow: none; border: 0; padding: 0; max-width: none; }
+  .cert-inner { min-height: 175mm; display: flex; flex-direction: column; justify-content: center; }
+}

@@ -73,6 +73,9 @@ export default async function AccountPage({ params, searchParams }: { params: Pr
               <span className="bar"><i style={{ width: `${Math.round((done / Math.max(total, 1)) * 100)}%` }} /></span>
               <span className="faint">{done} {t.course.of} {total}</span>
             </div>
+            {done === total && total > 0 ? (
+              <Link className="btn small" style={{ marginTop: 8 }} href={`/${locale}/courses/${c.slug}/certificate`}>🎓 {t.cert.get}</Link>
+            ) : null}
           </div>
         ))
       ) : (

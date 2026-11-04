@@ -20,6 +20,7 @@ import { Resources } from './collections/Resources'
 import { Users } from './collections/Users'
 import { AssistantCharter } from './globals/AssistantCharter'
 import { SchoolSettings } from './globals/SchoolSettings'
+import { Certificates } from './collections/Certificates'
 import { redeemEndpoint } from './endpoints/redeem'
 import { tutorEndpoint } from './endpoints/tutor'
 import { progressEndpoint } from './endpoints/progress'
@@ -59,7 +60,7 @@ export default buildConfig({
     defaultLocale: 'ru',
     fallback: true,
   },
-  collections: [Levels, Courses, Lessons, Resources, Glossary, AccessCodes, Users, Media, Documents],
+  collections: [Levels, Courses, Lessons, Resources, Glossary, AccessCodes, Certificates, Users, Media, Documents],
   globals: [AssistantCharter, SchoolSettings],
   endpoints: [redeemEndpoint, tutorEndpoint, progressEndpoint],
   editor: lexicalEditor(),
