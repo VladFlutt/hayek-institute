@@ -5,7 +5,7 @@
 export type ChatMessage = { role: 'system' | 'user' | 'assistant'; content: string }
 
 const PRESETS: Record<string, { baseUrl: string; model: string }> = {
-  groq: { baseUrl: 'https://api.groq.com/openai/v1', model: 'llama-3.3-70b-versatile' },
+  groq: { baseUrl: 'https://api.groq.com/openai/v1', model: 'openai/gpt-oss-120b' },
   openrouter: { baseUrl: 'https://openrouter.ai/api/v1', model: 'deepseek/deepseek-chat-v3-0324:free' },
   mistral: { baseUrl: 'https://api.mistral.ai/v1', model: 'mistral-small-latest' },
   gemini: { baseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai', model: 'gemini-flash-latest' },
