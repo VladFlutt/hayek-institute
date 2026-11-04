@@ -27,16 +27,28 @@ function fileName(title: string, ext: string) {
   return `${base || 'document'}.${ext}`
 }
 
+let lastReason = ''
+
 async function download(id: string): Promise<{ data: Buffer; mimetype: string } | null> {
   // PDF_DIR=<folder with <driveId>.pdf files> imports files fetched beforehand instead of downloading
   const local = process.env.PDF_DIR && path.join(process.env.PDF_DIR, `${id}.pdf`)
   if (local && existsSync(local)) return { data: readFileSync(local), mimetype: 'application/pdf' }
   const url = `https://drive.usercontent.google.com/download?id=${id}&export=download&confirm=t`
-  const res = await fetch(url, { redirect: 'follow' })
-  if (!res.ok) return null
-  const mimetype = (res.headers.get('content-type') || '').split(';')[0].trim()
-  if (!EXT[mimetype]) return null // an HTML sign-in page means the file is not public
-  return { data: Buffer.from(await res.arrayBuffer()), mimetype }
+  const res = await fetch(url, { redirect: 'follow', headers: { 'user-agent': 'Mozilla/5.0 (HayekInstitute import)' } })
+  const type = (res.headers.get('content-type') || '').split(';')[0].trim()
+  if (!res.ok) {
+    lastReason = `HTTP ${res.status} ${type}`
+    return null
+  }
+  const data = Buffer.from(await res.arrayBuffer())
+  // Drive often answers application/octet-stream, so trust the file signature, not the header
+  const head = data.subarray(0, 4).toString('latin1')
+  const mimetype = head === '%PDF' ? 'application/pdf' : head.startsWith('PK') && EXT[type] ? type : EXT[type] && type !== 'text/html' ? type : ''
+  if (!mimetype) {
+    lastReason = `not a document (${type}, ${data.length} bytes)`
+    return null
+  }
+  return { data, mimetype }
 }
 
 const payload = await getPayload({ config })
@@ -56,7 +68,7 @@ for (const r of docs) {
   try {
     const got = await download(id)
     if (!got) {
-      skipped.push(`${r.title} (${r.url})`)
+      skipped.push(`${r.title}: ${lastReason} (${r.url})`)
       continue
     }
     const doc = await payload.create({
